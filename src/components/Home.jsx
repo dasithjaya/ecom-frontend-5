@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import AppContext from "../Context/Context";
-import unplugged from "../assets/unplugged.png"
+import unplugged from "../assets/unplugged.png";
 
 const Home = ({ selectedCategory }) => {
   const { data, isError, addToCart, refreshData } = useContext(AppContext);
@@ -23,20 +23,20 @@ const Home = ({ selectedCategory }) => {
           data.map(async (product) => {
             try {
               const response = await axios.get(
-                `http://localhost:8080/api/product/${product.id}/image`,
-                { responseType: "blob" }
+                `http://localhost:8080/api/product/${product.productId}/image`,
+                { responseType: "blob" },
               );
               const imageUrl = URL.createObjectURL(response.data);
               return { ...product, imageUrl };
             } catch (error) {
               console.error(
                 "Error fetching image for product ID:",
-                product.id,
-                error
+                product.productId,
+                error,
               );
               return { ...product, imageUrl: "placeholder-image-url" };
             }
-          })
+          }),
         );
         setProducts(updatedProducts);
       };
@@ -52,7 +52,11 @@ const Home = ({ selectedCategory }) => {
   if (isError) {
     return (
       <h2 className="text-center" style={{ padding: "18rem" }}>
-      <img src={unplugged} alt="Error" style={{ width: '100px', height: '100px' }}/>
+        <img
+          src={unplugged}
+          alt="Error"
+          style={{ width: "100px", height: "100px" }}
+        />
       </h2>
     );
   }
@@ -81,45 +85,51 @@ const Home = ({ selectedCategory }) => {
           </h2>
         ) : (
           filteredProducts.map((product) => {
-            const { id, brand, name, price, productAvailable, imageUrl } =
-              product;
+            const {
+              productId,
+              brand,
+              productName,
+              price,
+              available,
+              imageUrl,
+            } = product;
             const cardStyle = {
               width: "18rem",
               height: "12rem",
               boxShadow: "rgba(0, 0, 0, 0.24) 0px 2px 3px",
-              backgroundColor: productAvailable ? "#fff" : "#ccc",
+              backgroundColor: available ? "#fff" : "#ccc",
             };
             return (
               <div
                 className="card mb-3"
                 style={{
                   width: "250px",
-                  height: "360px",
+                  height: "380px",
                   boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
                   borderRadius: "10px",
-                  overflow: "hidden", 
-                  backgroundColor: productAvailable ? "#fff" : "#ccc",
+                  overflow: "hidden",
+                  backgroundColor: available ? "#fff" : "#ccc",
                   display: "flex",
                   flexDirection: "column",
-                  justifyContent:'flex-start',
-                  alignItems:'stretch'
+                  justifyContent: "flex-start",
+                  alignItems: "stretch",
                 }}
-                key={id}
+                key={productId}
               >
                 <Link
-                  to={`/product/${id}`}
+                  to={`/product/${productId}`}
                   style={{ textDecoration: "none", color: "inherit" }}
                 >
                   <img
                     src={imageUrl}
-                    alt={name}
+                    alt={productName}
                     style={{
                       width: "100%",
-                      height: "150px", 
-                      objectFit: "cover",  
+                      height: "150px",
+                      objectFit: "cover",
                       padding: "5px",
                       margin: "0",
-                      borderRadius: "10px 10px 10px 10px", 
+                      borderRadius: "10px 10px 10px 10px",
                     }}
                   />
                   <div
@@ -135,9 +145,13 @@ const Home = ({ selectedCategory }) => {
                     <div>
                       <h5
                         className="card-title"
-                        style={{ margin: "0 0 10px 0", fontSize: "1.2rem" }}
+                        style={{
+                          margin: "0 0 10px 0",
+                          fontSize: "1.2rem",
+                          height: "50px",
+                        }}
                       >
-                        {name.toUpperCase()}
+                        {productName.toUpperCase()}
                       </h5>
                       <i
                         className="card-brand"
@@ -150,7 +164,11 @@ const Home = ({ selectedCategory }) => {
                     <div className="home-cart-price">
                       <h5
                         className="card-text"
-                        style={{ fontWeight: "600", fontSize: "1.1rem",marginBottom:'5px' }}
+                        style={{
+                          fontWeight: "600",
+                          fontSize: "1.1rem",
+                          marginBottom: "5px",
+                        }}
                       >
                         <i class="bi bi-currency-rupee"></i>
                         {price}
@@ -158,15 +176,15 @@ const Home = ({ selectedCategory }) => {
                     </div>
                     <button
                       className="btn-hover color-9"
-                      style={{margin:'10px 25px 0px '  }}
+                      style={{ margin: "10px 25px 0px " }}
                       onClick={(e) => {
                         e.preventDefault();
                         addToCart(product);
                       }}
-                      disabled={!productAvailable}
+                      disabled={!available}
                     >
-                      {productAvailable ? "Add to Cart" : "Out of Stock"}
-                    </button> 
+                      {available ? "Add to Cart" : "Out of Stock"}
+                    </button>
                   </div>
                 </Link>
               </div>
